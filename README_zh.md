@@ -6,6 +6,8 @@
 
 🌐 **访问地址：** [class.swufe.chat](https://class.swufe.chat)
 
+> **项目基础：** 本项目基于 [jcourse](https://github.com/SJTU-jCourse/jcourse) 开发，jcourse 是最初为上海交通大学开发的开源课程评价平台。感谢 jcourse 团队的出色工作。
+
 ## 目录
 
 - [项目概述](#项目概述)
