@@ -1,5 +1,4 @@
 # 阶段 1: 依赖安装
-# 使用 Node.js 25 与本地环境完全一致
 FROM node:25-alpine AS deps
 WORKDIR /app
 
@@ -15,6 +14,10 @@ FROM node:25-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# 接收构建参数，使 next.config.js 中的 rewrites 生效
+ARG REMOTE_URL
+ENV REMOTE_URL=$REMOTE_URL
 
 # 设置环境变量
 ENV NEXT_TELEMETRY_DISABLED 1
