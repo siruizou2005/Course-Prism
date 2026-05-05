@@ -97,18 +97,11 @@ export const BasicLayout = ({ children }: React.PropsWithChildren<{}>) => {
   );
 };
 
-export const LoginLayout = ({ children }: React.PropsWithChildren<{}>) => {
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
-  
-  return (
-    <Layout className="login-layout" style={{ background: "transparent" }}>
-      {isMobile && (
-        <Header className="header" style={{ background: "#fff", borderBottom: "1px solid #f0f0f0" }}>
-          <div className="title" style={{ color: "#000" }}>SWUFE选课社区</div>
-        </Header>
-      )}
-      <Content className="content" style={{ padding: 0, minHeight: "100vh" }}>{children}</Content>
-    </Layout>
-  );
-};
+export const LoginLayout = ({ children }: React.PropsWithChildren<{}>) => (
+  <Layout className="login-layout">
+    <Header className="header">
+      <div className="title">SWUFE选课社区</div>
+    </Header>
+    <Content className="content">{children}</Content>
+  </Layout>
+);

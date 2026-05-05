@@ -1,30 +1,73 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
+  basePath: process.env.BASE_PATH || undefined,
   reactStrictMode: true,
+  
+  // Performance optimizations
+  swcMinify: true,
   images: {
-    unoptimized: true, // 暂时禁用图片优化以避免问题
+    domains: ['localhost', 'www.swufe.tech', 'swufe.tech', 'class.swufe.chat'],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
   },
-  async rewrites() {
-    const remoteUrl = process.env.REMOTE_URL || process.env.NEXT_PUBLIC_REMOTE_URL || 'http://localhost:8000';
+  
+  // Compression
+  compress: true,
+  
+  // Disable problematic optimizations for compatibility
+  experimental: {
+    scrollRestoration: true,
+  },
+
+  async headers() {
     return [
       {
-        source: "/api/:path*",
-        destination: `${remoteUrl}/api/:path*/`,
-      },
-      {
-        source: "/oauth/:path*",
-        destination: `${remoteUrl}/oauth/:path*/`,
-      },
-      {
-        source: "/upload/:path*",
-        destination: `${remoteUrl}/upload/:path*/`,
-      },
-      {
-        source: "/static/:path*",
-        destination: `${remoteUrl}/static/:path*/`,
-      },
-    ];
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
+          }
+        ]
+      }
+    ]
   },
+
+  async redirects() {
+    return [];
+  },
+  async rewrites() {
+    if (process.env.REMOTE_URL) {
+      return [
+        {
+          source: "/api/:path*",
+          destination: `${process.env.REMOTE_URL}/api/:path*/`,
+        },
+        {
+          source: "/oauth/:path*",
+          destination: `${process.env.REMOTE_URL}/oauth/:path*/`,
+        },
+        {
+          source: "/upload/:path*",
+          destination: `${process.env.REMOTE_URL}/upload/:path*/`,
+        },
+        {
+          source: "/static/:path*",
+          destination: `${process.env.REMOTE_URL}/static/:path*/`,
+        },
+      ];
+    } else return [];
+  },
+  transpilePackages: ['ahooks']
 };
 
 module.exports = nextConfig;

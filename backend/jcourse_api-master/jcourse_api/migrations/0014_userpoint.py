@@ -52,5 +52,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': '积分',
             },
         ),
-        migrations.RunPython(make_up_old_point),
+        migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop),
     ]

@@ -2,7 +2,7 @@
 
 > **Language:** English | [中文](README_zh.md)
 
-A modern course review community platform for students at Southwestern University of Finance and Economics (SWUFE). Search courses, write reviews, rate instructors, and explore course statistics — all in one place.
+A course review community platform for students at Southwestern University of Finance and Economics (SWUFE). Search courses, write reviews, rate instructors, and explore course statistics — all in one place.
 
 🌐 **Live Site:** [class.swufe.chat](https://class.swufe.chat)
 
@@ -12,16 +12,16 @@ A modern course review community platform for students at Southwestern Universit
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
-- [Docker Deployment (Recommended)](#docker-deployment-recommended)
-- [Local Development](#local-development)
+- [Quick Start](#quick-start)
 - [Server Deployment](#server-deployment)
-- [Data Migration](#data-migration)
 - [Project Structure](#project-structure)
 - [Common Commands](#common-commands)
+- [Environment Variables](#environment-variables)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-Course-Prism is a modern course review community that provides:
+Course-Prism provides:
 
 - 📚 Course search and browsing
 - ✍️ Write and read course reviews
@@ -45,174 +45,118 @@ Course-Prism is a modern course review community that provides:
 **Backend:**
 - Django 6.0.2
 - Django REST Framework 3.16.1
-- PostgreSQL 16 (Docker)
-- Redis 5.2.0 (cache)
+- MySQL 8.0+ (database)
+- Redis (optional, for caching)
 - Huey 2.5.2 (task queue)
 - Gunicorn 23.0.0 / Uvicorn 0.32.0
 
-## Docker Deployment (Recommended)
-
-Docker is the simplest and fastest deployment method, offering:
-- ✅ Environment consistency — identical across dev, test, and production
-- ✅ One-command deployment — up and running in under 5 minutes
-- ✅ Easy migration — works on any cloud server
-- ✅ Simplified ops — automated backup, restore, and updates
+## Quick Start
 
 ### Prerequisites
 
-- Docker 20.10+
-- Docker Compose 2.0+ or `docker compose` plugin
-- At least 2 GB available memory
-- At least 5 GB available disk space
+- Node.js 18+ and Yarn
+- Python 3.12+
+- MySQL 8.0+
 
-### Quick Start
-
-1. **Clone the project**
-   ```bash
-   git clone https://github.com/siruizou2005/Course-Prism.git
-   cd Course-Prism
-   ```
-
-2. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   nano .env
-   ```
-
-   Required settings:
-   ```bash
-   SECRET_KEY=your-super-secret-key-here
-   POSTGRES_PASSWORD=your-secure-password
-   ALLOWED_HOSTS=your-domain.com,www.your-domain.com
-   CSRF_TRUSTED_ORIGINS=https://your-domain.com
-   ```
-
-3. **Deploy**
-   ```bash
-   chmod +x deploy.sh
-   ./deploy.sh
-   ```
-
-4. **Access the app**
-   - Frontend: http://localhost
-   - Backend API: http://localhost/api/
-   - Django Admin: http://localhost/admin/
-
-### Docker Compose Commands
-
-```bash
-docker-compose up -d                  # Start all services
-docker-compose logs -f                # View logs
-docker-compose logs -f backend        # View specific service logs
-docker-compose down                   # Stop services
-docker-compose restart                # Restart services
-docker-compose up -d --build          # Rebuild and start
-docker-compose exec backend bash      # Enter backend container
-docker-compose exec frontend sh       # Enter frontend container
-```
-
-### Data Management
-
-```bash
-./backup.sh                                                           # Backup database
-./restore.sh backups/db_backup_20260215_120000.sql                    # Restore database
-docker-compose exec backend python manage.py migrate                  # Run migrations
-docker-compose exec backend python manage.py createsuperuser          # Create superuser
-docker-compose exec backend python manage.py collectstatic --noinput  # Collect static files
-```
-
-### Development Environment
-
-```bash
-docker-compose -f docker-compose.dev.yml up -d    # Start (with hot reload)
-docker-compose -f docker-compose.dev.yml logs -f
-docker-compose -f docker-compose.dev.yml down
-```
-
-Dev environment access:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000
-- PostgreSQL: localhost:5432
-- Redis: localhost:6379
-
-> For full Docker documentation including architecture, SSL setup, and troubleshooting, see [DOCKER.md](DOCKER.md).
-
----
-
-## Local Development
-
-### Prerequisites
-
-- Node.js 18+ and Yarn (Node.js 20+ recommended)
-- Python 3.9+ (Python 3.11+ recommended)
-- Docker and Docker Compose (for PostgreSQL)
-- Redis (optional, for caching)
-
-### Setup
-
-#### 1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/siruizou2005/Course-Prism.git
 cd Course-Prism
 ```
 
-#### 2. Start PostgreSQL and Redis
+### 2. Set up MySQL
 
 ```bash
-docker-compose up -d
+# macOS
+brew install mysql
+brew services start mysql
+
+# Create database and user
+mysql -u root -p
 ```
 
-#### 3. Backend setup
+```sql
+CREATE DATABASE jcourse CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'jcourse'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON jcourse.* TO 'jcourse'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 3. Set up the backend
 
 ```bash
 cd backend/jcourse_api-master
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp ../../configs/backend.env.template .env
-# Edit .env with your settings
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
 ```
 
-#### 4. Frontend setup
+Create `.env`:
 
 ```bash
-cd frontend/jcourse-master
-yarn install
-cp ../../configs/frontend.env.template .env.local
-# Ensure .env.local contains:
-# NEXT_PUBLIC_REMOTE_URL=http://localhost:8000
-# REMOTE_URL=http://localhost:8000
-yarn dev
+DEBUG=True
+SECRET_KEY=your-secret-key
+MYSQL_DB=jcourse
+MYSQL_USER=jcourse
+MYSQL_PASSWORD=your_password
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-Visit http://localhost:3000 to view the app.
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+### 4. Set up the frontend
+
+```bash
+cd frontend
+yarn install
+```
+
+Create `frontend/.env.local`:
+
+```bash
+REMOTE_URL=http://localhost:8000
+```
+
+### 5. Start
+
+```bash
+# Terminal 1 — backend
+./start_backend.sh
+
+# Terminal 2 — frontend
+./start_frontend.sh
+```
+
+Visit http://localhost:3000.
 
 ---
 
 ## Server Deployment
 
-### 1. Prepare server environment
+### 1. Prepare the server
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y git curl wget build-essential nginx
 
-# Node.js 18
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Node.js 20
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 npm install -g yarn
 
 # Python
 sudo apt install -y python3 python3-pip python3-venv
 
-# Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
+# MySQL
+sudo apt install -y mysql-server
+sudo systemctl start mysql
+sudo mysql_secure_installation
 ```
 
 ### 2. Clone the project
@@ -224,40 +168,40 @@ sudo chown -R $USER:$USER Course-Prism
 cd Course-Prism
 ```
 
-### 3. Database setup (Docker)
+### 3. MySQL setup
 
 ```bash
-docker run -d \
-  --name jcourse-postgres \
-  --restart unless-stopped \
-  -e POSTGRES_DB=jcourse \
-  -e POSTGRES_USER=jcourse \
-  -e POSTGRES_PASSWORD=your_secure_password \
-  -p 5432:5432 \
-  -v jcourse-db-data:/var/lib/postgresql/data \
-  postgres:16
+sudo mysql -u root -p
+```
+
+```sql
+CREATE DATABASE jcourse CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'jcourse'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON jcourse.* TO 'jcourse'@'localhost';
+FLUSH PRIVILEGES;
 ```
 
 ### 4. Backend deployment
 
 ```bash
 cd backend/jcourse_api-master
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt gunicorn
-nano .env
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-**.env example:**
+Create `.env`:
+
 ```bash
 DEBUG=False
-SECRET_KEY=your-very-long-random-secret-key-here
-POSTGRES_PASSWORD=your_secure_password
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
+SECRET_KEY=your-very-long-random-secret-key
+MYSQL_DB=jcourse
+MYSQL_USER=jcourse
+MYSQL_PASSWORD=your_secure_password
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
 ALLOWED_HOSTS=your-domain.com,www.your-domain.com
 CSRF_TRUSTED_ORIGINS=https://your-domain.com
-REDIS_HOST=localhost
 ```
 
 ```bash
@@ -269,14 +213,13 @@ python manage.py createsuperuser
 ### 5. Frontend deployment
 
 ```bash
-cd ../../frontend/jcourse-master
+cd ../../frontend
 yarn install
-nano .env.local
 ```
 
-**.env.local example:**
+Create `frontend/.env.local`:
+
 ```bash
-NEXT_PUBLIC_REMOTE_URL=https://api.your-domain.com
 REMOTE_URL=https://api.your-domain.com
 NODE_ENV=production
 ```
@@ -288,18 +231,19 @@ yarn build
 ### 6. systemd services
 
 **Backend** — `/etc/systemd/system/jcourse-backend.service`:
+
 ```ini
 [Unit]
 Description=JCourse Backend (Django/Gunicorn)
-After=network.target postgresql.service
+After=network.target mysql.service
 
 [Service]
 Type=notify
 User=your-user
 Group=www-data
 WorkingDirectory=/var/www/Course-Prism/backend/jcourse_api-master
-Environment="PATH=/var/www/Course-Prism/backend/jcourse_api-master/venv/bin"
-ExecStart=/var/www/Course-Prism/backend/jcourse_api-master/venv/bin/gunicorn \
+Environment="PATH=/var/www/Course-Prism/backend/jcourse_api-master/.venv/bin"
+ExecStart=/var/www/Course-Prism/backend/jcourse_api-master/.venv/bin/gunicorn \
     --workers 3 \
     --bind 127.0.0.1:8000 \
     --timeout 120 \
@@ -312,6 +256,7 @@ WantedBy=multi-user.target
 ```
 
 **Frontend** — `/etc/systemd/system/jcourse-frontend.service`:
+
 ```ini
 [Unit]
 Description=JCourse Frontend (Next.js)
@@ -321,7 +266,7 @@ After=network.target
 Type=simple
 User=your-user
 Group=www-data
-WorkingDirectory=/var/www/Course-Prism/frontend/jcourse-master
+WorkingDirectory=/var/www/Course-Prism/frontend
 Environment="NODE_ENV=production"
 ExecStart=/usr/bin/yarn start
 Restart=always
@@ -389,51 +334,15 @@ sudo certbot --nginx -d your-domain.com -d www.your-domain.com -d api.your-domai
 
 ---
 
-## Data Migration
-
-### Export from old server
-
-```bash
-pg_dump -U jcourse -h localhost jcourse > full_database_backup.sql
-```
-
-### Transfer
-
-```bash
-scp full_database_backup.sql user@new-server:/var/www/Course-Prism/
-```
-
-### Import on new server
-
-```bash
-sudo -u postgres createdb jcourse
-sudo -u postgres createuser jcourse
-sudo -u postgres psql -c "ALTER USER jcourse WITH PASSWORD 'your_password';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE jcourse TO jcourse;"
-psql -U jcourse -d jcourse -h localhost < full_database_backup.sql
-```
-
-### Migrate media files
-
-```bash
-# On old server
-tar -czf media_files.tar.gz media/
-scp media_files.tar.gz user@new-server:/var/www/Course-Prism/backend/jcourse_api-master/
-
-# On new server
-tar -xzf media_files.tar.gz
-sudo chown -R your-user:www-data media/
-```
-
----
-
 ## Project Structure
 
 ```
 Course-Prism/
 ├── README.md
 ├── README_zh.md
-├── DOCKER.md
+├── CLAUDE.md
+├── start_backend.sh
+├── start_frontend.sh
 ├── configs/
 │   ├── backend.env.template
 │   ├── frontend.env.template
@@ -441,20 +350,20 @@ Course-Prism/
 │   └── jcourse-backend.service
 ├── backend/
 │   └── jcourse_api-master/
-│       ├── jcourse_api/
-│       ├── oauth/
-│       ├── ad/
+│       ├── jcourse/          # Django settings
+│       ├── jcourse_api/      # Main app (models, views, serializers)
+│       ├── oauth/            # Authentication
+│       ├── ad/               # Ads management
 │       ├── manage.py
 │       └── requirements.txt
 ├── frontend/
-│   └── jcourse-master/
-│       ├── src/
-│       │   ├── pages/
-│       │   ├── components/
-│       │   ├── services/
-│       │   └── lib/
-│       ├── public/
-│       └── package.json
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   ├── services/
+│   │   └── lib/
+│   ├── public/
+│   └── package.json
 ├── data/
 │   ├── data-*.csv
 │   └── import_to_database.py
@@ -467,13 +376,12 @@ Course-Prism/
 
 ```bash
 cd backend/jcourse_api-master
-source venv/bin/activate
+source .venv/bin/activate
 
 python manage.py runserver
 python manage.py makemigrations && python manage.py migrate
 python manage.py createsuperuser
 python manage.py collectstatic
-python manage.py test
 
 # Custom commands
 python manage.py check_duplicate
@@ -485,14 +393,14 @@ python manage.py update_semester
 ### Frontend (Next.js)
 
 ```bash
-cd frontend/jcourse-master
+cd frontend
 
 yarn install
 yarn dev      # development
 yarn build    # production build
 yarn start    # production server
-yarn format
 yarn test
+yarn format
 ```
 
 ### Service management
@@ -504,36 +412,38 @@ sudo journalctl -u jcourse-backend -f
 sudo journalctl -u jcourse-frontend -f
 ```
 
-## Troubleshooting
-
-| Issue | Solution |
-|---|---|
-| Frontend can't fetch data | Check `REMOTE_URL` in `.env.local`; verify backend is running |
-| Database connection failed | Check PostgreSQL status; verify `.env` credentials |
-| Static files not accessible | Run `collectstatic`; check Nginx `alias` path and file permissions |
-| Service won't start | Check logs: `journalctl -u jcourse-backend -n 50` |
-
 ## Environment Variables
 
 ### Backend
 
-| Variable | Required | Description |
-|---|---|---|
-| `SECRET_KEY` | Yes | Django secret key |
-| `DEBUG` | Yes | Set to `False` in production |
-| `POSTGRES_PASSWORD` | Yes | Database password |
-| `POSTGRES_HOST` | No | Database host (default: localhost) |
-| `ALLOWED_HOSTS` | Yes | Comma-separated allowed hostnames |
-| `CSRF_TRUSTED_ORIGINS` | Yes | Trusted origins for CSRF |
-| `REDIS_HOST` | No | Redis host (optional) |
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `SECRET_KEY` | Yes | — | Django secret key |
+| `DEBUG` | No | `False` | Set to `True` for development |
+| `MYSQL_DB` | No | `jcourse` | Database name |
+| `MYSQL_USER` | No | `jcourse` | Database user |
+| `MYSQL_PASSWORD` | No | `jcourse` | Database password |
+| `MYSQL_HOST` | No | `127.0.0.1` | Database host |
+| `MYSQL_PORT` | No | `3306` | Database port |
+| `ALLOWED_HOSTS` | Yes | — | Comma-separated hostnames |
+| `CSRF_TRUSTED_ORIGINS` | Yes (prod) | — | Trusted origins for CSRF |
+| `REDIS_HOST` | No | — | Redis host (enables caching) |
 
 ### Frontend
 
 | Variable | Required | Description |
 |---|---|---|
-| `NEXT_PUBLIC_REMOTE_URL` | Yes | API base URL (client-side) |
-| `REMOTE_URL` | Yes | API base URL (server-side) |
-| `NODE_ENV` | No | Runtime environment |
+| `REMOTE_URL` | Yes | Backend API URL for Next.js rewrites |
+
+## Troubleshooting
+
+| Issue | Solution |
+|---|---|
+| Frontend can't fetch data | Check `REMOTE_URL` in `frontend/.env.local`; verify backend is running |
+| Database connection failed | Check MySQL status (`brew services list` or `systemctl status mysql`); verify `.env` credentials |
+| Static files not accessible | Run `collectstatic`; check Nginx `alias` path |
+| Service won't start | Check logs: `journalctl -u jcourse-backend -n 50` |
+| `mysqlclient` install fails | Set `MYSQLCLIENT_CFLAGS` and `MYSQLCLIENT_LDFLAGS` — see `mysql_config --cflags --libs` |
 
 ## Contributing
 

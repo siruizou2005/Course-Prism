@@ -21,12 +21,12 @@ export const reportWebVitals = (metric: any) => {
 export const useWebVitals = () => {
   useEffect(() => {
     // Dynamically import web-vitals to avoid affecting bundle size
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(reportWebVitals);
-      getFID(reportWebVitals);
-      getFCP(reportWebVitals);
-      getLCP(reportWebVitals);
-      getTTFB(reportWebVitals);
+    import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
+      onCLS(reportWebVitals);
+      onINP(reportWebVitals);
+      onFCP(reportWebVitals);
+      onLCP(reportWebVitals);
+      onTTFB(reportWebVitals);
     }).catch(() => {
       // Silently fail if web-vitals is not available
     });

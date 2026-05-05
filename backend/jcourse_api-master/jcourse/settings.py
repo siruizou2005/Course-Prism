@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres',
     'huey.contrib.djhuey',
     'jcourse_api',
     'rest_framework',
@@ -108,12 +107,16 @@ if REDIS_HOST:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'jcourse',
-        'USER': 'jcourse',
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'jcourse'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432')
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DB', 'jcourse'),
+        'USER': os.environ.get('MYSQL_USER', 'jcourse'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'jcourse'),
+        'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 

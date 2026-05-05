@@ -84,8 +84,7 @@ htmlcov/
 
 # Python virtual environment
 backend/jcourse_api-master/venv/
-frontend/jcourse-master/node_modules/
-frontend/jcourse-master/.next/
+backend/jcourse_api-master/.venv/
 
 
 

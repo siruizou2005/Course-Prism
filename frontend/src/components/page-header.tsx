@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Col, Row, Space, Typography, Grid } from "antd";
+import React from "react";
 
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -10,10 +11,10 @@ const PageHeader = ({
   onBack,
   extra,
 }: {
-  title: string | JSX.Element;
+  title: string | React.ReactNode;
   subTitle?: string;
   onBack?: () => void;
-  extra?: JSX.Element;
+  extra?: React.ReactNode;
 }) => {
   const screens = useBreakpoint();
   

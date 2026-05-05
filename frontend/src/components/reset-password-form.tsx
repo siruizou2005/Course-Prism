@@ -14,7 +14,7 @@ const ResetPasswordForm = ({
 }) => {
   const [form] = Form.useForm();
   const [time, setTime] = useState<number>(0);
-  const timeRef = useRef<any>();
+  const timeRef = useRef<any>(null);
   const inCounter = time != 0;
   const router = useRouter();
 
