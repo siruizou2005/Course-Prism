@@ -196,7 +196,7 @@ const DiscoverPage = () => {
           >
             找到
             <span style={{ color: "#2563eb", position: "relative" }}>
-              值得选
+              最适合你
               <span style={{
                 content: '""',
                 position: "absolute",
