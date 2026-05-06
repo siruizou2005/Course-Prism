@@ -13,11 +13,11 @@ import {
 } from "@/lib/models";
 import { fetcher, request } from "@/services/request";
 
-export function useReviews(pagination: Pagination) {
-  const { data, error } = useSWR<PaginationApiResult<Review>>(
-    `/api/review/?page=${pagination.page}&size=${pagination.pageSize}`,
-    fetcher
-  );
+export function useReviews(pagination: Pagination, sort?: string) {
+  let url = `/api/review/?page=${pagination.page}&size=${pagination.pageSize}`;
+  if (sort === "hot") url += `&order=approves`;
+  if (sort === "high") url += `&order=rating`;
+  const { data, error } = useSWR<PaginationApiResult<Review>>(url, fetcher);
   return {
     reviews: data,
     loading: !error && !data,

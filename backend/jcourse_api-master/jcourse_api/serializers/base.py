@@ -98,7 +98,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = TeamMember
-        fields = ('id', 'name', 'role', 'class_name', 'description', 'avatar_url', 'github', 'qq', 'wechat', 'email', 'order')
+        fields = ('id', 'name', 'role', 'class_name', 'description', 'avatar_url', 'github', 'qq', 'wechat', 'email', 'website', 'order')
         
     def get_avatar_url(self, obj):
         if obj.avatar:

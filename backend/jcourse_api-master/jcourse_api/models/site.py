@@ -47,6 +47,7 @@ class TeamMember(models.Model):
     qq = models.CharField(verbose_name='QQ号', max_length=20, blank=True)
     wechat = models.CharField(verbose_name='微信号', max_length=100, blank=True)
     email = models.EmailField(verbose_name='邮箱', blank=True)
+    website = models.URLField(verbose_name='个人网站', blank=True)
     order = models.PositiveIntegerField(verbose_name='排序', default=0)
     is_active = models.BooleanField(verbose_name='是否显示', default=True)
     created_at = models.DateTimeField(verbose_name='添加时间', default=timezone.now)

@@ -87,7 +87,7 @@ const LoginPage = () => {
       content: <AboutCard />,
       okText: "确认",
       icon: null,
-      width: screens.md ? "80%" : 520,
+      width: screens.md ? "80%" : "90%",
     });
   }
 
@@ -146,7 +146,7 @@ const LoginPage = () => {
 
   return (
     <div style={{ 
-      minWidth: "324px", 
+      width: "100%",
       marginInline: "auto",
       padding: isMobile ? "16px" : "0",
       maxWidth: isMobile ? "100%" : "400px"

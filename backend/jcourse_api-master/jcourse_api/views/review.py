@@ -46,6 +46,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if 'order' in self.request.query_params:
             if self.request.query_params['order'] == 'approves':
                 return reviews.order_by(F('approve_count').desc(nulls_last=True), F('created_at').desc(nulls_last=True))
+            if self.request.query_params['order'] == 'rating':
+                return reviews.order_by(F('rating').desc(nulls_last=True), F('created_at').desc(nulls_last=True))
         return reviews
 
     def get_serializer_class(self):

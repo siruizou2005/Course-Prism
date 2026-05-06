@@ -1,5 +1,5 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Skeleton } from "antd";
+import { Skeleton, Grid } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -8,6 +8,8 @@ import { useState } from "react";
 import AuthGuardLink from "@/components/auth-guard-link";
 import { CourseInReview, Pagination, Review, Semester } from "@/lib/models";
 import { useReviews } from "@/services/review";
+
+const { useBreakpoint } = Grid;
 
 /* ── helpers ── */
 
@@ -83,11 +85,13 @@ const ReviewRow = ({ review }: { review: Review }) => {
 
 const DiscoverPage = () => {
   const router = useRouter();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<"latest" | "hot" | "high">("latest");
 
   const pagination: Pagination = { page: 1, pageSize: 9 };
-  const { reviews, loading } = useReviews(pagination);
+  const { reviews, loading } = useReviews(pagination, tab);
 
   const handleSearch = () => {
     const q = query.trim();
@@ -151,7 +155,7 @@ const DiscoverPage = () => {
             zIndex: 2,
             maxWidth: 1200,
             margin: "0 auto",
-            padding: "88px 32px 72px",
+            padding: isMobile ? "40px 16px 36px" : "88px 32px 72px",
             textAlign: "center",
           }}
         >
@@ -177,7 +181,7 @@ const DiscoverPage = () => {
               display: "inline-block",
               flexShrink: 0,
             }}/>
-            西南财经大学 · 学生自治选课社区
+            西南财经大学 · 选课社区
           </div>
 
           <h1
@@ -208,7 +212,7 @@ const DiscoverPage = () => {
           </h1>
           <p
             style={{
-              fontSize: 17,
+              fontSize: isMobile ? 15 : 17,
               color: "#64748b",
               margin: "0 auto 36px",
               maxWidth: 640,
@@ -225,8 +229,8 @@ const DiscoverPage = () => {
                 display: "grid",
                 gridTemplateColumns: "auto 1fr auto auto",
                 alignItems: "center",
-                height: 60,
-                padding: "0 8px 0 22px",
+                height: isMobile ? 48 : 60,
+                padding: isMobile ? "0 6px 0 14px" : "0 8px 0 22px",
                 background: "white",
                 border: "1px solid #e6e8ee",
                 borderRadius: 999,
@@ -262,7 +266,7 @@ const DiscoverPage = () => {
               <button
                 onClick={handleSearch}
                 style={{
-                  height: 44, padding: "0 24px",
+                  height: isMobile ? 36 : 44, padding: isMobile ? "0 16px" : "0 24px",
                   background: "#2563eb", color: "white",
                   border: 0, borderRadius: 999,
                   fontSize: 15, fontWeight: 600,
@@ -315,7 +319,7 @@ const DiscoverPage = () => {
           {/* stats */}
           <dl
             style={{
-              margin: "56px auto 0",
+              margin: isMobile ? "36px auto 0" : "56px auto 0",
               padding: 0,
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -384,7 +388,7 @@ const DiscoverPage = () => {
           <rect width="1440" height="600" fill="url(#fade2)"/>
         </svg>
 
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto", padding: "64px 32px 40px" }}>
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto",           padding: isMobile ? "32px 16px 24px" : "64px 32px 40px" }}>
         {/* section header */}
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 28, gap: 24, flexWrap: "wrap" }}>
           <div>
@@ -393,20 +397,21 @@ const DiscoverPage = () => {
               共 {reviews?.count ?? "…"} 条 · 来自真实同学
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ display: "inline-flex", padding: 3, background: "#f7f8fb", borderRadius: 999, border: "1px solid #e6e8ee" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 12, flexWrap: "wrap" }}>
+            <div style={{ display: "inline-flex", padding: 3, background: "#f1f5f9", borderRadius: 10, border: "1px solid #e2e8f0" }}>
               {(["latest", "hot", "high"] as const).map((t, i) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   style={{
                     border: 0, background: tab === t ? "white" : "transparent",
-                    padding: "6px 16px", fontSize: 13.5,
-                    color: tab === t ? "#0f172a" : "#64748b",
-                    fontWeight: 500, borderRadius: 999, cursor: "pointer",
-                    transition: "all .15s",
-                    boxShadow: tab === t ? "0 1px 3px rgba(15,23,42,0.08)" : "none",
+                    padding: isMobile ? "6px 14px" : "7px 20px", fontSize: isMobile ? 13 : 14,
+                    color: tab === t ? "#1e293b" : "#94a3b8",
+                    fontWeight: tab === t ? 600 : 500, borderRadius: 8, cursor: "pointer",
+                    transition: "all .2s ease",
+                    boxShadow: tab === t ? "0 1px 3px rgba(15,23,42,0.1), 0 1px 2px rgba(15,23,42,0.06)" : "none",
                     fontFamily: "inherit",
+                    letterSpacing: "0.3px",
                   }}
                 >
                   {["最新", "最热", "高分"][i]}
@@ -482,12 +487,12 @@ const DiscoverPage = () => {
             <circle cx="100" cy="100" r="30" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1"/>
           </svg>
         </div>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 32px", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: 32, position: "relative" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "32px 16px" : "56px 32px", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr auto", alignItems: "center", gap: isMobile ? 20 : 32, position: "relative" }}>
           <div>
             <h3 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 700, letterSpacing: "-0.3px" }}>选过的课，写下你的看法</h3>
             <p style={{ margin: 0, fontSize: 15, opacity: 0.85 }}>每一条真实的点评，都是给学弟学妹的礼物。</p>
           </div>
-          <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+            <div style={{ display: "flex", gap: 10, flexShrink: 0, flexWrap: "wrap" }}>
             <AuthGuardLink href="/write-review" loginMessage="请先登录后再写点评">
               <button style={{ background: "white", color: "#2563eb", border: 0, borderRadius: 999, padding: "12px 24px", fontSize: 14.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
                 写一条点评

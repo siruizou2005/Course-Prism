@@ -48,14 +48,14 @@ const CourseItem = ({
       {(commonInfo) => {
         const hasRating = course.rating.count > 0;
         const ratingBlock = hasRating ? (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, minWidth: 72 }}>
-            <span style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: ratingColor(course.rating.avg) }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, minWidth: isMobile ? 52 : 72 }}>
+            <span style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, lineHeight: 1, color: ratingColor(course.rating.avg) }}>
               {course.rating.avg.toFixed(1)}
             </span>
-            <span style={{ fontSize: 11, color: "#94a3b8" }}>{course.rating.count}人评价</span>
+            <span style={{ fontSize: isMobile ? 10 : 11, color: "#94a3b8" }}>{course.rating.count}人评价</span>
           </div>
         ) : (
-          <span style={{ fontSize: 13, color: "#94a3b8", minWidth: 72, textAlign: "right" }}>暂无点评</span>
+          <span style={{ fontSize: 13, color: "#94a3b8", minWidth: isMobile ? 52 : 72, textAlign: "right" }}>暂无点评</span>
         );
 
         return (
@@ -64,20 +64,20 @@ const CourseItem = ({
               {/* Title row */}
               <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                 <span style={{
-                  fontSize: 11, fontWeight: 700, color: "#2563eb",
+                  fontSize: isMobile ? 10 : 11, fontWeight: 700, color: "#2563eb",
                   background: "#eff6ff", padding: "2px 7px", borderRadius: 4,
                   letterSpacing: 0.3,
                 }}>
                   {course.code}
                 </span>
-                <Link href={"/course/" + course.id} style={{ fontSize: 15, fontWeight: 600, color: "#0f172a" }}>
+                <Link href={"/course/" + course.id} style={{ fontSize: isMobile ? 14 : 15, fontWeight: 600, color: "#0f172a" }}>
                   {highlight(course.name, keyword)}
                 </Link>
-                <span style={{ fontSize: 13, color: "#64748b" }}>· {course.teacher}</span>
+                <span style={{ fontSize: isMobile ? 12 : 13, color: "#64748b" }}>· {course.teacher}</span>
               </div>
 
               {/* Meta row */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 12.5, color: "#64748b" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexWrap: "wrap", fontSize: isMobile ? 11.5 : 12.5, color: "#64748b" }}>
                 {showEnroll && commonInfo?.enrolled_courses.has(course.id) && (
                   <Tag color={Config.TAG_COLOR_ENROLL} style={{ margin: 0 }}>学过</Tag>
                 )}

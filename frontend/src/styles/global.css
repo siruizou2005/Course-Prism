@@ -11,6 +11,7 @@ body {
 .hero-breakout {
   width: 100vw;
   margin-left: calc(50% - 50vw);
+  overflow-x: hidden;
 }
 .title {
   font-weight: 600;
@@ -262,4 +263,35 @@ body {
 
 .review-item .ant-list-item-action {
   margin-top: 10px;
+}
+
+/* ---------- Mobile responsive ---------- */
+@media (max-width: 576px) {
+  .hero-breakout .hero-content {
+    padding: 40px 16px 36px !important;
+  }
+  .hero-breakout .search-box-inner {
+    height: 48px !important;
+    padding: 0 6px 0 14px !important;
+  }
+  .hero-breakout .search-box-inner input {
+    font-size: 14px !important;
+    padding: 0 8px !important;
+  }
+  .hero-breakout .search-btn {
+    height: 36px !important;
+    padding: 0 16px !important;
+    font-size: 13px !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+    padding: 32px 16px 20px !important;
+  }
+  .footer-bottom {
+    flex-direction: column !important;
+    gap: 8px !important;
+    text-align: center !important;
+    font-size: 11.5px !important;
+  }
 }

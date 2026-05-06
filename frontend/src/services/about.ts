@@ -12,6 +12,7 @@ interface TeamMember {
   qq: string;
   wechat: string;
   email: string;
+  website: string;
   order: number;
 }
 

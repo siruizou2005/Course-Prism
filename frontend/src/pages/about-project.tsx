@@ -1,5 +1,5 @@
 import { Card, Col, Row, Space, Typography, Avatar, Button, Divider, Modal, message } from "antd";
-import { GithubOutlined, MailOutlined, QqOutlined, WechatOutlined } from "@ant-design/icons";
+import { GithubOutlined, MailOutlined, QqOutlined, WechatOutlined, GlobalOutlined } from "@ant-design/icons";
 import Head from "next/head";
 import { useAboutData } from "@/services/about";
 import { useState } from "react";
@@ -17,6 +17,7 @@ interface TeamMember {
   qq: string;
   wechat: string;
   email: string;
+  website: string;
   order: number;
 }
 
@@ -157,6 +158,15 @@ const AboutProjectPage = () => {
                             type="text" 
                             icon={<MailOutlined />}
                             onClick={() => showContactModal('邮箱', member.email, member.name)}
+                            size="small"
+                          />
+                        )}
+                        {member.website && (
+                          <Button 
+                            type="text" 
+                            icon={<GlobalOutlined />}
+                            href={member.website}
+                            target="_blank"
                             size="small"
                           />
                         )}

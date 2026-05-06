@@ -5,12 +5,15 @@ const HomePage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (router.isReady) {
-      router.replace("/latest");
-    }
-  }, [router.isReady]);
+    if (!router.isReady) return;
+    router.replace("/latest");
+  }, [router.isReady, router]);
 
-  return null;
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: "#999" }}>
+      正在跳转...
+    </div>
+  );
 };
 
 export default HomePage;
