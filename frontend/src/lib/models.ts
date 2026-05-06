@@ -32,6 +32,7 @@ export type CourseListItem = {
   credit: number;
   teacher: string;
   rating: { avg: number; count: number };
+  features: string[];
 };
 
 export type CourseDetail = {
@@ -194,9 +195,13 @@ export type Report = {
 };
 
 export type CoursesFilterParams = {
+  q?: string;
   categories?: string;
   departments?: string;
   onlyhasreviews?: string;
+  credit?: string;
+  min_rating?: string;
+  feature?: string;
 };
 
 export type EmailLoginRequest = {

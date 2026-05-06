@@ -30,19 +30,59 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = CourseFilter
 
     def get_queryset(self):
-        courses = get_course_list_queryset(self.request.user)
-        if 'notification_level' in self.request.query_params:
-            notification_level = int(self.request.query_params['notification_level'])
-            filtered_course_ids = CourseNotificationLevel.objects.filter(user=self.request.user,
-                                                                         notification_level=notification_level) \
-                .order_by('modified_at').values('course_id')
+        from jcourse_api.features import FEATURE_NAME_TO_KEY
+        params = self.request.query_params
+        q = params.get('q', '').strip()
+        if q:
+            courses = get_search_course_queryset(q, self.request.user)
+        else:
+            courses = get_course_list_queryset(self.request.user)
+
+        if 'notification_level' in params:
+            notification_level = int(params['notification_level'])
+            filtered_course_ids = CourseNotificationLevel.objects.filter(
+                user=self.request.user, notification_level=notification_level
+            ).order_by('modified_at').values('course_id')
             courses = courses.filter(id__in=filtered_course_ids)
-        if 'onlyhasreviews' in self.request.query_params:
+
+        if 'min_rating' in params:
+            try:
+                courses = courses.filter(review_avg__gte=float(params['min_rating']), review_count__gt=0)
+            except ValueError:
+                pass
+
+        if 'credit' in params:
+            credit_val = params['credit']
+            try:
+                if credit_val == '5plus':
+                    courses = courses.filter(credit__gte=5)
+                else:
+                    courses = courses.filter(credit=float(credit_val))
+            except ValueError:
+                pass
+
+        if 'feature' in params:
+            feature_name = params['feature']
+            feature_key = FEATURE_NAME_TO_KEY.get(feature_name)
+            if feature_key:
+                courses = courses.filter(**{f"has_feature_{feature_key}": True})
+
+        if 'onlyhasreviews' in params:
+            mode = params['onlyhasreviews']
             courses = courses.filter(review_count__gt=0). \
                 annotate(count=F('review_count'), avg=F('review_avg'))
-            if self.request.query_params['onlyhasreviews'] == 'count':
+            if mode == 'count':
                 return courses.order_by(F('count').desc(nulls_last=True), F('avg').desc(nulls_last=True), "id")
+            if mode == 'latest':
+                from django.db.models import Subquery, OuterRef
+                last_review = Review.objects.filter(
+                    course=OuterRef('pk')
+                ).order_by('-created_at').values('created_at')[:1]
+                return courses.annotate(
+                    last_review_at=Subquery(last_review)
+                ).order_by(F('last_review_at').desc(nulls_last=True), "id")
             return courses.order_by(F('avg').desc(nulls_last=True), F('count').desc(nulls_last=True), "id")
+
         return courses.all()
 
     def get_serializer_class(self):

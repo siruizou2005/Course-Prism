@@ -1,6 +1,10 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: {}, pathname: "/courses", push: jest.fn() }),
+}));
+
 import CourseItem from "@/components/course-item";
 import { CommonInfo, CourseListItem } from "@/lib/models";
 import { CommonInfoContext } from "@/lib/context";
@@ -38,6 +42,7 @@ describe("course detail card", () => {
       credit: 2,
       teacher: "高女士",
       rating: { count: 0, avg: 0 },
+      features: [],
     };
     commonInfo = getTestCommonInfo();
   });
@@ -47,13 +52,11 @@ describe("course detail card", () => {
         <CourseItem course={course} showEnroll={false}></CourseItem>
       </CommonInfoContext.Provider>
     );
-    expect(
-      screen.queryByText("test001 测试课程（高女士）")
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText("test001 测试课程（高女士）")?.getAttribute("href")
-    ).toBe("/course/12345");
-    expect(screen.queryByText("2学分 测试单位")).toBeInTheDocument();
+    expect(screen.queryByText("test001")).toBeInTheDocument();
+    expect(screen.queryByText("测试课程")).toBeInTheDocument();
+    const link = screen.queryByRole("link", { name: "测试课程" });
+    expect(link).toBeInTheDocument();
+    expect(link?.getAttribute("href")).toBe("/course/12345");
     expect(screen.queryByText("暂无点评")).toBeInTheDocument();
     expect(screen.queryByText("学过")).not.toBeInTheDocument();
     expect(screen.queryByText("已点评")).not.toBeInTheDocument();

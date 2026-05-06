@@ -43,7 +43,9 @@ const nextConfig = {
   },
 
   async redirects() {
-    return [];
+    return [
+      { source: "/search", destination: "/courses", permanent: false },
+    ];
   },
   async rewrites() {
     if (process.env.REMOTE_URL) {

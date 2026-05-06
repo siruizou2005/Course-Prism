@@ -75,6 +75,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     )
     teacher = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
+    features = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -87,6 +88,15 @@ class CourseListSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_teacher(obj: Course):
         return obj.main_teacher.name
+
+    @staticmethod
+    def get_features(obj: Course):
+        from jcourse_api.features import FEATURE_KEYWORD_MAP
+        result = []
+        for key, (display_name, _) in FEATURE_KEYWORD_MAP.items():
+            if getattr(obj, f"has_feature_{key}", False):
+                result.append(display_name)
+        return result
 
 
 class CourseInReviewListSerializer(serializers.ModelSerializer):

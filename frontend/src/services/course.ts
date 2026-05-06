@@ -33,21 +33,25 @@ export async function getCourseList(
 
 export function useCourseList(
   params: CoursesFilterParams,
-  pagination: Pagination
+  pagination: Pagination,
+  skip = false
 ) {
   let query_params: string = "";
+  if (params.q) query_params += `&q=${encodeURIComponent(params.q)}`;
   if (params.categories) query_params += `&categories=${params.categories}`;
   if (params.departments) query_params += `&department=${params.departments}`;
-  if (params.onlyhasreviews)
-    query_params += `&onlyhasreviews=${params.onlyhasreviews}`;
+  if (params.onlyhasreviews) query_params += `&onlyhasreviews=${params.onlyhasreviews}`;
+  if (params.credit) query_params += `&credit=${params.credit}`;
+  if (params.min_rating) query_params += `&min_rating=${params.min_rating}`;
+  if (params.feature) query_params += `&feature=${encodeURIComponent(params.feature)}`;
 
   const { data, error } = useSWR<PaginationApiResult<CourseListItem>>(
-    `/api/course/?${query_params}&page=${pagination.page}&size=${pagination.pageSize}`,
+    skip ? null : `/api/course/?${query_params}&page=${pagination.page}&size=${pagination.pageSize}`,
     fetcher
   );
   return {
     courses: data,
-    loading: !error && !data,
+    loading: skip ? false : !error && !data,
     error: error,
   };
 }

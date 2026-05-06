@@ -67,7 +67,6 @@ const NavBar = ({ user }: { user?: User }) => {
     { label: "关注", value: "/follow-review" },
     { label: "课程", value: "/courses" },
     { label: "关于", value: "/about-project" },
-    { label: "统计", value: "/statistics" },
   ];
 
   const handleNavClick = (path: string) => {
@@ -110,7 +109,7 @@ const NavBar = ({ user }: { user?: User }) => {
                 shape="circle"
                 icon={<SearchOutlined />}
                 className="search-button"
-                onClick={() => router.push("/search")}
+                onClick={() => router.push("/courses")}
               />
             </Col>
             <Col>
@@ -127,7 +126,7 @@ const NavBar = ({ user }: { user?: User }) => {
                 shape="circle"
                 icon={<SearchOutlined />}
                 className="search-button"
-                onClick={() => router.push("/search")}
+                onClick={() => router.push("/courses")}
               />
             </Col>
             <Col>

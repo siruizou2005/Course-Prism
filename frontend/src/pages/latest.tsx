@@ -91,7 +91,7 @@ const DiscoverPage = () => {
 
   const handleSearch = () => {
     const q = query.trim();
-    if (q) router.push({ pathname: "/search", query: { q } });
+    if (q) router.push({ pathname: "/courses", query: { q } });
   };
 
   return (
@@ -283,7 +283,7 @@ const DiscoverPage = () => {
               {HOT_TAGS.map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => router.push({ pathname: "/search", query: { q: tag } })}
+                  onClick={() => router.push({ pathname: "/courses", query: { q: tag } })}
                   style={{
                     display: "inline-block",
                     padding: "4px 12px",

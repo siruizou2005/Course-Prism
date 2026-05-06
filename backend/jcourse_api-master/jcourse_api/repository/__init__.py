@@ -1,6 +1,7 @@
-from django.db.models import Subquery, OuterRef, Q
+from django.db.models import Subquery, OuterRef, Q, Exists
 
 from jcourse_api.models import *
+from jcourse_api.features import FEATURE_KEYWORD_MAP
 
 
 def get_semesters():
@@ -11,39 +12,85 @@ def get_announcements():
     return Announcement.objects.filter(available=True)
 
 
+def _annotate_features(queryset):
+    for key, (_, keywords) in FEATURE_KEYWORD_MAP.items():
+        kw_q = Q()
+        for kw in keywords:
+            kw_q |= Q(comment__contains=kw)
+        queryset = queryset.annotate(**{
+            f"has_feature_{key}": Exists(Review.objects.filter(kw_q, course=OuterRef('pk')))
+        })
+    return queryset
+
+
 def get_course_list_queryset(user: User):
-    return Course.objects.select_related('main_teacher').prefetch_related('categories', 'department')
+    qs = Course.objects.select_related('main_teacher').prefetch_related('categories', 'department')
+    return _annotate_features(qs)
+
+
+def _build_term_q(term: str) -> Q:
+    return (
+        Q(code__icontains=term) |
+        Q(name__icontains=term) |
+        Q(main_teacher__name__icontains=term) |
+        Q(main_teacher__pinyin__iexact=term) |
+        Q(main_teacher__abbr_pinyin__icontains=term)
+    )
+
+
+def _cjk_chars(s: str) -> list[str]:
+    """Extract CJK characters from string."""
+    return [c for c in s if '一' <= c <= '鿿']
+
+
+def _char_and_name_q(chars: list[str]) -> Q:
+    """Course name must contain ALL listed characters (in any order)."""
+    q = Q()
+    for c in chars:
+        q &= Q(name__contains=c)
+    return q
 
 
 def get_search_course_queryset(q: str, user: User):
     from django.db.models import F, Case, When, IntegerField
-    
+    from jcourse_api.aliases import SEARCH_ALIASES
+
     courses = get_course_list_queryset(user)
     if q == '':
         return courses.none()
-    
-    courses = courses.filter(
-        Q(code__icontains=q) | Q(name__icontains=q) | Q(main_teacher__name__icontains=q) |
-        Q(main_teacher__pinyin__iexact=q) | Q(main_teacher__abbr_pinyin__icontains=q))
-    
-    # 添加排序：优先展示有评价的课程
-    # 1. 有评价的课程排在前面（review_count > 0）
-    # 2. 在有评价的课程中，按评价数量降序排列
-    # 3. 在评价数量相同的情况下，按平均评分降序排列
-    # 4. 没有评价的课程排在最后，按课程名排序
+
+    # 1. Exact / alias search (covers course code, name, teacher)
+    terms = [q] + SEARCH_ALIASES.get(q, [])
+    exact_q = Q()
+    for term in terms:
+        exact_q |= _build_term_q(term)
+
+    # 2. Character AND fuzzy matching on course name (2+ CJK chars)
+    cjk = _cjk_chars(q)
+    fuzzy_q = _char_and_name_q(cjk) if len(cjk) >= 2 else Q()
+
+    courses = courses.filter(exact_q | fuzzy_q)
+
+    # Rank: exact match first, then fuzzy-only; within each tier sort by reviews
     courses = courses.annotate(
+        match_tier=Case(
+            When(exact_q, then=0),   # exact / alias match → tier 0 (best)
+            default=1,               # fuzzy-only match    → tier 1
+            output_field=IntegerField(),
+        ),
         has_reviews=Case(
-            When(review_count__gt=0, then=1),
-            default=0,
-            output_field=IntegerField()
-        )
+            When(review_count__gt=0, then=0),
+            default=1,
+            output_field=IntegerField(),
+        ),
     ).order_by(
-        '-has_reviews',  # 有评价的排在前面
-        F('review_count').desc(nulls_last=True),  # 评价数量降序
-        F('review_avg').desc(nulls_last=True),    # 平均评分降序
-        'name'  # 最后按课程名排序
+        'match_tier',
+        'has_reviews',
+        F('review_count').desc(nulls_last=True),
+        F('review_avg').desc(nulls_last=True),
+        'name',
     )
-    
+
     return courses
 
 

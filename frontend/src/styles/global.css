@@ -140,6 +140,126 @@ body {
   max-width: 100%;
 }
 
+/* ---------- Course filter sidebar ---------- */
+.filter-sidebar {
+  background: white;
+  border: 1px solid #e6e8ee;
+  border-radius: 12px;
+  padding: 8px 0;
+}
+.filter-group {
+  padding: 14px 18px;
+  border-bottom: 1px solid #eef0f4;
+}
+.filter-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.filter-title small {
+  font-weight: 400;
+  color: #94a3b8;
+  font-size: 12px;
+}
+.filter-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.filter-item:hover { background: #f7f8fb; }
+.filter-item.on { background: #eff6ff; color: #1d4ed8; font-weight: 500; }
+.filter-item .count { color: #94a3b8; font-size: 12px; }
+.filter-item.on .count { color: #2563eb; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-chip {
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #e6e8ee;
+  color: #334155;
+  background: white;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: inherit;
+}
+.filter-chip:hover { border-color: #dbeafe; color: #2563eb; }
+.filter-chip.on { background: #eff6ff; border-color: #dbeafe; color: #1d4ed8; font-weight: 500; }
+.filter-rating-item {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.filter-rating-item:hover { background: #f7f8fb; }
+.filter-rating-item.on { background: #eff6ff; }
+
+/* ---------- Active filter chips (courses page toolbar) ---------- */
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.active-filter-chip button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+.active-filter-chip button:hover { background: rgba(37,99,235,0.15); }
+.clear-filters-btn {
+  border: 0;
+  background: transparent;
+  font-size: 12.5px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+}
+.clear-filters-btn:hover { color: #2563eb; }
+.sort-select {
+  border: 1px solid #e6e8ee;
+  border-radius: 8px;
+  padding: 6px 28px 6px 10px;
+  font-size: 13.5px;
+  color: #0f172a;
+  background: white;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font-family: inherit;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
 .review-item .ant-list-item-action {
   margin-top: 10px;
 }
