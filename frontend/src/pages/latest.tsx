@@ -218,7 +218,7 @@ const DiscoverPage = () => {
               maxWidth: 640,
             }}
           >
-            来自 12,000+ 名同学的真实点评，覆盖 SWUFE 全校 1,800+ 门课程
+            来自 1,000+ 名同学的真实点评，覆盖 SWUFE 全校全部课程
           </p>
 
           {/* search bar */}

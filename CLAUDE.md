@@ -256,3 +256,115 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 - `frontend.env.template` - 前端环境变量模板
 - `nginx.conf` / `nginx-ssl.conf` - Nginx 配置
 - `jcourse-backend.service` / `jcourse-frontend.service` - systemd 服务配置
+
+---
+
+## 生产环境部署说明
+
+### 服务器信息
+
+- **服务器**: GCP 台湾服务器
+- **域名**: class.swufe.chat
+- **部署目录**: /home/zousirui2005/jcourse
+- **操作系统**: Ubuntu 24.04
+
+### 技术栈
+
+| 组件 | 技术 | 端口 |
+|------|------|------|
+| 前端 | Next.js 16 (yarn start) | 3000 |
+| 后端 | Django + Gunicorn | 8000 |
+| 数据库 | MySQL 8.0 | 3306 |
+| 缓存 | Redis 7.0 | 6379 |
+| 反向代理 | Caddy | 80, 443 |
+
+### 更新部署步骤
+
+```bash
+# 1. 获取最新代码
+cd /tmp && rm -rf Course-Prism && git clone https://github.com/siruizou2005/Course-Prism.git
+
+# 2. 备份配置
+cp /home/zousirui2005/jcourse/backend/jcourse_api-master/.env /tmp/.env.backup
+cp /home/zousirui2005/jcourse/frontend/.env.local /tmp/.env.local.backup
+
+# 3. 替换代码
+cd /home/zousirui2005 && rm -rf jcourse_old && mv jcourse jcourse_old
+mv /tmp/Course-Prism jcourse
+
+# 4. 恢复配置
+cp /tmp/.env.backup /home/zousirui2005/jcourse/backend/jcourse_api-master/.env
+cp /tmp/.env.local.backup /home/zousirui2005/jcourse/frontend/.env.local
+
+# 5. 更新权限
+chown -R zousirui2005:zousirui2005 /home/zousirui2005/jcourse
+
+# 6. 更新后端依赖
+cd /home/zousirui2005/jcourse/backend/jcourse_api-master
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 7. 运行数据库迁移
+python manage.py migrate --noinput
+
+# 8. 更新前端依赖并构建
+cd /home/zousirui2005/jcourse/frontend
+yarn install
+yarn build
+
+# 9. 重启服务
+systemctl restart jcourse-backend jcourse-frontend
+```
+
+### 服务管理命令
+
+```bash
+# 查看服务状态
+systemctl status jcourse-backend jcourse-frontend
+
+# 查看日志
+journalctl -u jcourse-backend -f
+journalctl -u jcourse-frontend -f
+
+# 重启服务
+systemctl restart jcourse-backend
+systemctl restart jcourse-frontend
+
+# 重启 Caddy
+systemctl reload caddy
+```
+
+### 环境变量
+
+**后端 (.env)**:
+```
+DEBUG=False
+SECRET_KEY=course-prism-swufe-secret-key-change-in-prod-2026
+ALLOWED_HOSTS=class.swufe.chat,localhost,127.0.0.1,backend
+CSRF_TRUSTED_ORIGINS=https://class.swufe.chat,http://localhost
+MYSQL_DB=jcourse
+MYSQL_USER=jcourse
+MYSQL_PASSWORD=jcourse_swufe_2026
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+**前端 (.env.local)**:
+```
+REMOTE_URL=http://localhost:8000
+NODE_ENV=production
+```
+
+### 数据库备份
+
+数据库备份文件位于项目根目录或 `original-data/backups/` 目录。
+
+```bash
+# 导入数据库
+mysql -u jcourse -pjcourse_swufe_2026 jcourse < backup_YYYYMMDD.sql
+
+# 导出数据库
+mysqldump -u jcourse -pjcourse_swufe_2026 jcourse > backup_$(date +%Y%m%d).sql
+```

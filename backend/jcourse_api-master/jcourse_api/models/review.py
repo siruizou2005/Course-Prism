@@ -46,7 +46,7 @@ class Review(models.Model):
                 need_to_update = True
                 old_course = previous.course
 
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         if need_to_update:
             update_course_reviews(self.course)
             if old_course and old_course != self.course:
@@ -103,7 +103,7 @@ class ReviewReaction(models.Model):
             if previous.review_id != self.review_id or previous.reaction != self.reaction:
                 need_to_update = True
                 old_review = previous.review
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         if need_to_update:
             update_review_reactions(self.review)
             if old_review and old_review != self.review:

@@ -16,7 +16,7 @@ class UserProfile(models.Model):
     last_seen_at = models.DateTimeField(verbose_name='活跃时间', db_index=True, blank=True, default=None, null=True)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         self.sync_suspended_status()
 
     def sync_suspended_status(self):
