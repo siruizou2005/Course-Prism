@@ -63,7 +63,7 @@ const NavBar = ({ user }: { user?: User }) => {
   ];
 
   const navItems = [
-    { label: "最新", value: "/latest" },
+    { label: "发现", value: "/latest" },
     { label: "关注", value: "/follow-review" },
     { label: "课程", value: "/courses" },
     { label: "关于", value: "/about-project" },

@@ -20,6 +20,7 @@ const getTestCommonInfo = () => {
     my_reviews: new Map(),
     enrolled_courses: new Map(),
     reviewed_courses: new Map(),
+    promotions: new Map(),
   };
   return commonInfo;
 };

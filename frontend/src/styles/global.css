@@ -8,6 +8,10 @@
 body {
   margin: 0 !important;
 }
+.hero-breakout {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
 .title {
   font-weight: 600;
   overflow: hidden;
@@ -48,14 +52,6 @@ body {
 }
 .header {
   background: white !important;
-}
-@media (prefers-color-scheme: dark) {
-  .title {
-    color: white !important;
-  }
-  .header {
-    background: #141414 !important;
-  }
 }
 .navbar {
   align-content: center;
