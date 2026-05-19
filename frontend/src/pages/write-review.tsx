@@ -39,6 +39,11 @@ const WriteReviewPage = () => {
   const [form] = Form.useForm();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+  const [enrollSemester, setEnrollSemester] = useState<number>(0);
+  const [fetching, setFetching] = useState(false);
+  const [courses, setCourses] = useState<CourseInReview[]>([]);
+  const [nextPage, setNextPage] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // 立即检查登录状态并重定向
   useEffect(() => {
@@ -49,6 +54,56 @@ const WriteReviewPage = () => {
       return;
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (course_id) {
+      getCourseInReview(course_id as string).then((course: CourseInReview) => {
+        const enrollSemesterId = commonInfo.enrolled_courses.get(
+          parseInt(course_id as string)
+        )?.semester_id;
+        setCourses([course]);
+        form.setFieldsValue({
+          course: parseInt(course_id as string),
+          semester: enrollSemesterId,
+        });
+        setEnrollSemester(enrollSemesterId || 0);
+      });
+    } else if (review_id) {
+      getReview(review_id as string).then((review: Review) => {
+        if (!commonInfo.my_reviews.has(review.id) && user?.is_staff == false) {
+          message.error("只能修改自己的点评！", 1, () => history.back());
+          return;
+        }
+        const course: CourseInReview = review.course!;
+        const semester = review.semester as Semester;
+        setCourses([course]);
+        const enrollSemesterId = commonInfo.enrolled_courses.get(course.id)?.semester_id;
+        setEnrollSemester(enrollSemesterId || 0);
+        form.setFieldsValue({
+          course: course.id,
+          semester: semester.id,
+          comment: review.comment,
+          rating: review.rating,
+          score: review.score,
+        });
+      });
+    }
+  }, [router.query, user]);
+
+  const { run: debounceFetcher } = useDebounceFn(
+    (value: string) => {
+      setFetching(true);
+      searchCourseInReview(value, null).then((courses) => {
+        setNextPage(courses.next);
+        setCourses(courses.results);
+        setFetching(false);
+      });
+    },
+    {
+      wait: 800,
+    }
+  );
 
   // 如果未登录或正在加载，立即处理
   if (loading) {
@@ -63,12 +118,6 @@ const WriteReviewPage = () => {
   if (!user) {
     return null;
   }
-
-  const [enrollSemester, setEnrollSemester] = useState<number>(0);
-  const [fetching, setFetching] = useState(false);
-  const [courses, setCourses] = useState<CourseInReview[]>([]);
-  const [nextPage, setNextPage] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
 
   const semestersInSelect =
     enrollSemester != 0 ? commonInfo.semesters : commonInfo.available_semesters;
@@ -110,56 +159,6 @@ const WriteReviewPage = () => {
         });
     }
   };
-
-  useEffect(() => {
-    if (course_id) {
-      getCourseInReview(course_id as string).then((course: CourseInReview) => {
-        const enrollSemester = commonInfo.enrolled_courses.get(
-          parseInt(course_id as string)
-        )?.semester_id;
-        setCourses([course]);
-        form.setFieldsValue({
-          course: parseInt(course_id as string),
-          semester: enrollSemester,
-        });
-        setEnrollSemester(enrollSemester || 0);
-      });
-    } else if (review_id) {
-      getReview(review_id as string).then((review: Review) => {
-        if (!commonInfo.my_reviews.has(review.id) && user?.is_staff == false) {
-          message.error("只能修改自己的点评！", 1, () => history.back());
-          return;
-        }
-        const course: CourseInReview = review.course!;
-        const semester = review.semester as Semester;
-        setCourses([course]);
-        const enrollSemester = commonInfo.enrolled_courses.get(course.id)?.semester_id;
-
-        setEnrollSemester(enrollSemester || 0);
-        form.setFieldsValue({
-          course: course.id,
-          semester: semester.id,
-          comment: review.comment,
-          rating: review.rating,
-          score: review.score,
-        });
-      });
-    }
-  }, [router.query]);
-
-  const { run: debounceFetcher } = useDebounceFn(
-    (value: string) => {
-      setFetching(true);
-      searchCourseInReview(value, null).then((courses) => {
-        setNextPage(courses.next);
-        setCourses(courses.results);
-        setFetching(false);
-      });
-    },
-    {
-      wait: 800,
-    }
-  );
 
   const loadMore = () => {
     if (nextPage == null) return;
