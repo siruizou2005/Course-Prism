@@ -4,7 +4,7 @@
 
 A course review community platform for students at Southwestern University of Finance and Economics (SWUFE). Search courses, write reviews, rate instructors, and explore course statistics — all in one place.
 
-🌐 **Live Site:** [class.swufe.chat](https://class.swufe.chat)
+🌐 **Live Site:** [class.swufe.club](https://class.swufe.club)
 
 > **Based on:** This project is based on [jcourse](https://github.com/SJTU-jCourse/jcourse), the open-source course review platform originally developed for Shanghai Jiao Tong University. We sincerely thank the jcourse team for their excellent work.
 
