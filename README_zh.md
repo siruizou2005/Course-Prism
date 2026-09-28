@@ -4,7 +4,7 @@
 
 西南财经大学（SWUFE）课程评价社区平台，学生可以搜索课程、查看/撰写评价、关注课程、查看课程统计信息。
 
-🌐 **访问地址：** [class.swufe.chat](https://class.swufe.chat)
+🌐 **访问地址：** [class.swufe.club](https://class.swufe.club)
 
 > **项目基础：** 本项目基于 [jcourse](https://github.com/SJTU-jCourse/jcourse) 开发，jcourse 是最初为上海交通大学开发的开源课程评价平台。感谢 jcourse 团队的出色工作。
 
